@@ -27,7 +27,7 @@ func drawTermChart(label []string, data []int) {
 
 	// Determine width of chart
 	dataPoints := len(data)
-	barWidth := 3
+	barWidth := 4
 	barGap := 1
 	width := (barWidth * dataPoints) + (barGap * (dataPoints - 2))
 
@@ -67,7 +67,7 @@ func drawTermChart(label []string, data []int) {
 			bclabels := labels[z]
 			bc.Data = datas[z]
 			bc.Height = 30
-			bc.BarWidth = (barWidth * requiredCharts)
+			bc.BarWidth = int(float64(barWidth) * 1.5)
 			bc.BarGap = barGap
 			bc.DataLabels = bclabels
 			bc.TextColor = termui.ColorWhite
