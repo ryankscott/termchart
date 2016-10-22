@@ -142,25 +142,24 @@ func main() {
 		if z == false {
 			break
 		} else {
+
+			line := x.Text()
 			if rows == 0 {
-				line := x.Text()
 				delim = tryDetectDelimeter(line)
-			} else {
-
-				values := strings.Split(x.Text(), delim)
-				intVal, err := strconv.ParseInt(values[1], 10, 64)
-				if err != nil {
-					log.WithFields(log.Fields{
-						"message": "Failed to convert value to int",
-						"value":   values[1],
-					}).Panic("Failed to convert input data to int")
-				}
-
-				labels = append(labels, values[0])
-				data = append(data, int(intVal))
 			}
-			rows++
+			values := strings.Split(line, delim)
+			intVal, err := strconv.ParseInt(values[1], 10, 64)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"message": "Failed to convert value to int",
+					"value":   values[1],
+				}).Panic("Failed to convert input data to int")
+			}
+
+			labels = append(labels, values[0])
+			data = append(data, int(intVal))
 		}
+		rows++
 	}
 	drawTermChart(labels, data)
 }
