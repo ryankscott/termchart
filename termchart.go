@@ -16,57 +16,6 @@ import (
 // - Different chart types
 // - Check sizing
 
-// func drawChart(data []chart.Value) {
-// 	barSpacing := 3
-// 	barWidth := 26
-// 	width := 1600
-// 	if len(data) < 40 {
-// 		width = 800
-// 		barWidth = 20
-// 		barSpacing = 4
-// 	}
-// 	bc := chart.BarChart{
-// 		Width: width,
-// 		// Height:     400,
-// 		BarWidth:   barWidth,
-// 		BarSpacing: barSpacing,
-// 		XAxis: chart.Style{
-// 			Show:      true,
-// 			FontSize:  8.0,
-// 			FontColor: drawing.ColorWhite,
-// 		},
-// 		YAxis: chart.YAxis{
-// 			Style: chart.Style{
-// 				Show:      true,
-// 				FontSize:  8.0,
-// 				FontColor: drawing.ColorWhite,
-// 			},
-// 		},
-
-// 		Canvas: chart.Style{
-// 			Padding: chart.Box{
-// 				Right: 100,
-// 			},
-// 		},
-// 		Background: chart.Style{
-// 			FillColor: drawing.ColorBlack,
-// 			Padding: chart.Box{
-// 				Bottom: 25,
-// 			},
-// 		},
-// 		Bars: data,
-// 	}
-// 	buffer := bytes.NewBuffer([]byte{})
-// 	err := bc.Render(chart.PNG, buffer)
-// 	if err != nil {
-// 		panic(err)
-
-// 	}
-// 	r := io.Reader(buffer)
-// 	imgcat.Cat(r, os.Stdout)
-
-// }
-
 func drawTermChart(label []string, data []int) {
 	if err := termui.Init(); err != nil {
 		log.WithFields(log.Fields{
@@ -183,10 +132,6 @@ func tryDetectColTypes(l string, d string) []string {
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
-
-	mustResolveArgs(os.Args[1:])
-
-	// var dataMap []chart.Value
 	var data []int
 	var labels []string
 	var delim string
@@ -203,13 +148,6 @@ func main() {
 			} else {
 
 				values := strings.Split(x.Text(), delim)
-				// val, err := strconv.ParseFloat(values[1], 10)
-				// if err != nil {
-				// 	log.WithFields(log.Fields{
-				// 		"message": "Failed to convert value to float",
-				// 		"value":   values[1],
-				// 	}).Panic("Failed to convert input data to float")
-				// }
 				intVal, err := strconv.ParseInt(values[1], 10, 64)
 				if err != nil {
 					log.WithFields(log.Fields{
@@ -220,14 +158,9 @@ func main() {
 
 				labels = append(labels, values[0])
 				data = append(data, int(intVal))
-				// var v chart.Value
-				// v.Value = val
-				// v.Label = values[0][:2]
-				// dataMap = append(dataMap, v)
 			}
 			rows++
 		}
 	}
 	drawTermChart(labels, data)
-	//	drawChart(dataMap)
 }
