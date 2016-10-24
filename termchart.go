@@ -17,14 +17,6 @@ import (
 // - Check sizing
 
 func drawTermChart(label []string, data []int) {
-	if err := termui.Init(); err != nil {
-		log.WithFields(log.Fields{
-			"message": "Failed to start termui",
-			"value":   err,
-		}).Panic("Failed to start termui")
-	}
-	defer termui.Close()
-
 	// Determine width of chart
 	dataPoints := len(data)
 	barWidth := 4
@@ -132,34 +124,39 @@ func tryDetectColTypes(l string, d string) []string {
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
-	var data []int
-	var labels []string
-	var delim string
-	var rows int
+	if err := termui.Init(); err != nil {
+		log.WithField("value", err).Fatal("Failed to start termui")
+	}
+	defer termui.Close()
+
+	var (
+		data   []int
+		labels []string
+		delim  string
+		rows   int
+	)
 	x := bufio.NewScanner(os.Stdin)
 	for {
 		z := x.Scan()
 		if z == false {
 			break
-		} else {
-
-			line := x.Text()
-			if rows == 0 {
-				delim = tryDetectDelimeter(line)
-			}
-			values := strings.Split(line, delim)
-			intVal, err := strconv.ParseInt(values[1], 10, 64)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"message": "Failed to convert value to int",
-					"value":   values[1],
-				}).Panic("Failed to convert input data to int")
-			}
-
-			labels = append(labels, values[0])
-			data = append(data, int(intVal))
 		}
+
+		line := x.Text()
+		if rows == 0 {
+			delim = tryDetectDelimeter(line)
+		}
+		values := strings.Split(line, delim)
+		intVal, err := strconv.ParseInt(values[1], 10, 64)
+		if err != nil {
+			log.WithField("value", values[1]).Fatal("Failed to convert input data to int")
+		}
+
+		labels = append(labels, values[0])
+		data = append(data, int(intVal))
+
 		rows++
 	}
+
 	drawTermChart(labels, data)
 }
