@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"math"
 	"os"
@@ -10,6 +11,10 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gizak/termui"
+)
+
+var (
+	colorForeground = termui.ColorWhite
 )
 
 // TODO:
@@ -32,9 +37,9 @@ func drawTermChart(label []string, data []int) {
 		bc.BarWidth = barWidth
 		bc.BarGap = barGap
 		bc.DataLabels = bclabels
-		bc.TextColor = termui.ColorWhite
+		bc.TextColor = colorForeground
 		bc.BarColor = termui.ColorBlue
-		bc.NumColor = termui.ColorWhite
+		bc.NumColor = colorForeground
 		termui.Body.AddRows(
 			termui.NewRow(
 				termui.NewCol(12, 0, bc),
@@ -62,9 +67,9 @@ func drawTermChart(label []string, data []int) {
 			bc.BarWidth = int(float64(barWidth) * 1.5)
 			bc.BarGap = barGap
 			bc.DataLabels = bclabels
-			bc.TextColor = termui.ColorWhite
+			bc.TextColor = colorForeground
 			bc.BarColor = termui.ColorBlue
-			bc.NumColor = termui.ColorWhite
+			bc.NumColor = colorForeground
 			bc.SetY(z * 30)
 			barCharts[z] = bc
 			termui.Body.AddRows(
@@ -122,6 +127,19 @@ func tryDetectColTypes(l string, d string) []string {
 	return colTypes
 }
 
+func mustParseFlags() {
+	var theme string
+	flag.StringVar(&theme, "theme", "dark", "color theme to use; one of: light, dark")
+	flag.Parse()
+	if theme != "light" && theme != "dark" {
+		log.WithFields(log.Fields{"value": theme}).Fatal("unsupported theme name")
+	}
+
+	if theme == "light" {
+		colorForeground = termui.ColorBlack
+	}
+}
+
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	if err := termui.Init(); err != nil {
@@ -135,6 +153,8 @@ func main() {
 		delim  string
 		rows   int
 	)
+	mustParseFlags()
+
 	x := bufio.NewScanner(os.Stdin)
 	for {
 		z := x.Scan()
