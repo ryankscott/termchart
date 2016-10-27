@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"math"
 	"os"
 	"strconv"
@@ -166,10 +165,28 @@ func main() {
 	}
 	defer termui.Close()
 
+	// Handlers
 	termui.Handle("/sys/kbd/q", func(termui.Event) {
-		fmt.Println("Trying to kill")
 		termui.StopLoop()
 	})
+
+	termui.Handle("/sys/kbd/C-c", func(termui.Event) {
+		termui.StopLoop()
+	})
+
+	termui.Handle("/sys/kbd/C-d", func(termui.Event) {
+		termui.StopLoop()
+	})
+	termui.Handle("/sys/kbd/C-x", func(termui.Event) {
+		termui.StopLoop()
+	})
+	termui.Handle("/sys/wnd/resize", func(e termui.Event) {
+		termui.Body.Width = termui.TermWidth()
+		termui.Body.Align()
+		termui.Clear()
+		termui.Render(termui.Body)
+	})
+
 	drawTermChart(labels, data)
 	termui.Loop()
 
