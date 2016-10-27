@@ -27,16 +27,18 @@ func drawTermChart(label []string, data []int) {
 	barWidth := 4
 	barGap := 1
 	width := (barWidth * dataPoints) + (barGap * (dataPoints - 2))
+	termWidth := termui.TermWidth()
+	termHeight := termui.TermHeight()
 
 	// If we can fit it all in one screen
-	if width < 200 {
+	if width < termWidth {
 		bc := termui.NewBarChart()
-		bclabels := label
 		bc.Data = data
-		bc.Height = 30
+		bc.Height = termHeight
+		bc.Width = termWidth
 		bc.BarWidth = barWidth
 		bc.BarGap = barGap
-		bc.DataLabels = bclabels
+		bc.DataLabels = label
 		bc.TextColor = colorForeground
 		bc.BarColor = termui.ColorBlue
 		bc.NumColor = colorForeground
@@ -63,7 +65,7 @@ func drawTermChart(label []string, data []int) {
 			bc := termui.NewBarChart()
 			bclabels := labels[z]
 			bc.Data = datas[z]
-			bc.Height = 30
+			bc.Height = termHeight / requiredCharts
 			bc.BarWidth = int(float64(barWidth) * 1.5)
 			bc.BarGap = barGap
 			bc.DataLabels = bclabels
@@ -81,11 +83,6 @@ func drawTermChart(label []string, data []int) {
 		termui.Body.Align()
 		termui.Render(termui.Body)
 	}
-
-	termui.Handle("/sys/kbd/q", func(termui.Event) {
-		termui.StopLoop()
-	})
-	termui.Loop()
 
 }
 
@@ -179,4 +176,9 @@ func main() {
 	}
 
 	drawTermChart(labels, data)
+	termui.Handle("/sys/kbd/q", func(termui.Event) {
+		termui.StopLoop()
+	})
+	termui.Loop()
+
 }
