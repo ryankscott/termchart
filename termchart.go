@@ -46,11 +46,8 @@ func drawTermChart(label []string, data []int) {
 			termui.NewRow(
 				termui.NewCol(12, 0, bc),
 			))
-		termui.Body.Align()
-		termui.Render(termui.Body)
 	} else {
 		requiredCharts := int(math.Ceil(float64(width) / 200.0))
-		fmt.Println("Number of charts required:", requiredCharts)
 		var datas = make([][]int, requiredCharts)
 		var labels = make([][]string, requiredCharts)
 		// Split the data
@@ -80,9 +77,9 @@ func drawTermChart(label []string, data []int) {
 				),
 			)
 		}
-		termui.Body.Align()
-		termui.Render(termui.Body)
 	}
+	termui.Body.Align()
+	termui.Render(termui.Body)
 
 }
 
@@ -139,11 +136,6 @@ func mustParseFlags() {
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
-	if err := termui.Init(); err != nil {
-		log.WithField("value", err).Fatal("Failed to start termui")
-	}
-	defer termui.Close()
-
 	var (
 		data   []int
 		labels []string
@@ -151,15 +143,12 @@ func main() {
 		rows   int
 	)
 	mustParseFlags()
-
-	x := bufio.NewScanner(os.Stdin)
-	for {
-		z := x.Scan()
-		if z == false {
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
 			break
 		}
-
-		line := x.Text()
 		if rows == 0 {
 			delim = tryDetectDelimeter(line)
 		}
@@ -168,17 +157,20 @@ func main() {
 		if err != nil {
 			log.WithField("value", values[1]).Fatal("Failed to convert input data to int")
 		}
-
 		labels = append(labels, values[0])
 		data = append(data, int(intVal))
-
 		rows++
 	}
+	if err := termui.Init(); err != nil {
+		log.WithField("value", err).Fatal("Failed to start termui")
+	}
+	defer termui.Close()
 
-	drawTermChart(labels, data)
 	termui.Handle("/sys/kbd/q", func(termui.Event) {
+		fmt.Println("Trying to kill")
 		termui.StopLoop()
 	})
+	drawTermChart(labels, data)
 	termui.Loop()
 
 }
